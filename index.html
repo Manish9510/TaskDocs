@@ -80,11 +80,115 @@
 <li><code>mkdocs -h</code> - Print help message and exit.</li>
 </ul>
 <h2 id="project-layout">Project layout</h2>
-<pre><code>mkdocs.yml    # The configuration file.
-docs/
-    index.md  # The documentation homepage.
-    ...       # Other markdown pages, images and other files.
-</code></pre></div>
+<pre><code>Documentation: Parsing and Visualizing Switch Data
+
+Overview
+</code></pre>
+<p>This document describes the process used to parse, transform, and visualize switch data from a file. The goal was to extract switch and node information, structure it hierarchically, and represent it in a tree format using D3.js. </p>
+<p>•   Steps and File Descriptions</p>
+<ol>
+<li>Parsing the Switch Data
+Purpose: Convert raw switch data from a information file into a structured JSON format.</li>
+</ol>
+<p>File: <code>parse_switch_data.js</code></p>
+<p>Description: This script reads the binary file containing switch data, parses it, and writes the output to a JSON file. The parsing involves extracting switch names, GUIDs, descriptions, and nodes. It also identifies whether a switch has links to other switches.</p>
+<p>-Input: A binary file (<code>iblatest.unknown</code>).
+- Output: A JSON file (<code>parsed_data_new_yukti.json</code>) containing an array of switch objects with detailed information.</p>
+<p>Key Functions:
+1. <strong><code>parseSwitchData(filePath)</code></strong>: Parses the input file to extract switch details and node ranges.
+2. <strong><code>expandNodeRanges(nodes)</code></strong>: Expands node ranges into individual nodes.
+3. <strong><code>processRange(range, expandedNodes)</code></strong>: Processes node ranges to generate a list of nodes.</p>
+<p><strong>Output JSON Structure</strong>:</p>
+<pre><code class="language-json">[
+    {
+        &quot;switch_name&quot;: &quot;ibsw1&quot;,
+        &quot;guid&quot;: &quot;0x0800380300b90060&quot;,
+        &quot;description&quot;: &quot;pm2-wpe1&quot;,
+        &quot;nodes&quot;: [
+            &quot;Mellanox&quot;,
+            &quot;cn108&quot;,
+            &quot;cn109&quot;,
+            // more nodes
+        ],
+        &quot;hasLink&quot;: true
+    },
+    // more switches
+]
+</code></pre>
+<ol>
+<li>Transforming the Data
+Purpose: Structure the parsed data into a format suitable for visualization. It categorizes switches into L1 and L2 and prepares a hierarchical format.</li>
+</ol>
+<p>File: <code>transform_data.js</code></p>
+<p>Description: This script processes the parsed JSON data to categorize switches and organize them into a tree structure. L1 switches have links and contain nodes, while L2 switches do not.</p>
+<ul>
+<li>Input: The JSON file from the previous step (<code>parsed_data_new_yukti.json</code>).</li>
+<li>Output: A JSON file (<code>result_new_yukti.json</code>) containing the structured data for visualization.</li>
+</ul>
+<p>Key Functions:
+1. Categorization: Distinguishes between L1 and L2 switches based on their link status.
+2. Hierarchical Structure: Links L0 switches (nodes) to L1 switches based on their presence in the node list.</p>
+<p>Output JSON Structure:</p>
+<pre><code class="language-json">{
+    &quot;l2Switches&quot;: [
+        // L2 switches
+    ],
+    &quot;l1Switches&quot;: [
+        {
+            &quot;switch_name&quot;: &quot;ibsw1&quot;,
+            &quot;nodes&quot;: [
+                &quot;Mellanox&quot;,
+                &quot;cn108&quot;,
+                // more nodes
+            ]
+        },
+        // more L1 switches
+    ]
+}
+</code></pre>
+<pre><code>3. Visualizing the Data
+</code></pre>
+<p>Purpose: Render the structured data into a visual tree representation using D3.js.</p>
+<p>File: <code>index.html</code></p>
+<p>Description: The HTML file sets up the basic structure for displaying the visualization. It includes references to the D3.js library and the JavaScript file that creates the visualization.</p>
+<p>Key Elements:
+- <code>&lt;div id="tree-container"&gt;&lt;/div&gt;</code>: Container for the tree visualization.
+- Script Tags: Include D3.js and the custom script for visualization.</p>
+<p>File: <code>script.js</code></p>
+<p>Description: This script uses D3.js to create and render the tree structure based on the JSON data. It creates SVG elements for nodes, links, and labels.</p>
+<p>Key Functions:
+1. Data Loading: Loads the JSON data using <code>d3.json()</code>.
+2. Tree Layout: Uses <code>d3.tree()</code> to compute the tree layout.
+3. SVG Elements: Appends SVG elements to represent nodes, links, and labels.</p>
+<p>Output:
+- Visualization: A tree diagram where nodes represent switches and links represent connections.</p>
+<p>File: <code>styles.css</code></p>
+<p>Description: The CSS file styles the tree visualization, including node colors, link styles, and label positions.</p>
+<p>Key CSS Classes:
+- <strong><code>.link</code></strong>: Styles for the lines connecting nodes.
+- <strong><code>.node</code></strong>: Styles for the nodes in the tree.
+- <strong><code>.label</code></strong>: Styles for the text labels on the nodes.</p>
+<p>Example CSS:</p>
+<pre><code class="language-css">#tree-container {
+  margin: 20px;
+}
+
+.link {
+  stroke: #ccc;
+  stroke-width: 2px;
+}
+
+.node {
+  fill: #000;
+}
+
+.label {
+  font-size: 12px;
+  fill: #333;
+}
+</code></pre>
+<p>Conclusion</p>
+<p>By following these steps, you can effectively parse, transform, and visualize switch data. The provided scripts and files handle the entire process from raw data extraction to a visual tree representation, making it easy to understand and analyze the switch network.</p></div>
             </div>
         </div>
 
@@ -166,5 +270,5 @@ docs/
 
 <!--
 MkDocs version : 1.6.1
-Build Date UTC : 2024-10-08 11:27:55.573712+00:00
+Build Date UTC : 2024-10-08 11:32:30.247821+00:00
 -->
